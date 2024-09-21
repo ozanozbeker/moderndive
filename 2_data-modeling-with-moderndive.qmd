@@ -1,0 +1,17 @@
+---
+title: "II. Data Modeling with moderndive"
+format: html
+---
+
+## Initialization
+
+```{r}
+library(tidyverse)
+library(nycflights13)
+library(moderndive)
+library(fivethirtyeight)
+```
+
+## Basic Regression
+
+## Multiple Regression

@@ -1,0 +1,167 @@
+---
+title: "I. Data Science with tidyverse"
+format: html
+---
+
+## Initialization
+
+```{r}
+library(tidyverse)
+library(nycflights13)
+library(moderndive)
+library(fivethirtyeight)
+```
+
+## Data Visualization
+
+**Scatter Plots**
+
+```{r}
+ggplot(data = alaska_flights, mapping = aes(x = dep_delay, y = arr_delay)) + 
+  geom_point()
+```
+
+```{r}
+ggplot(data = alaska_flights, mapping = aes(x = dep_delay, y = arr_delay)) + 
+  geom_point(alpha = 0.2)
+```
+
+```{r}
+ggplot(data = alaska_flights, mapping = aes(x = dep_delay, y = arr_delay)) + 
+  geom_jitter(width = 30, height = 30)
+```
+
+**Linegraphs**
+
+```{r}
+ggplot(
+  data = early_january_weather, 
+  mapping = aes(x = time_hour, y = temp) ) +
+  geom_line()
+```
+
+**Histograms**
+
+```{r}
+ggplot(data = weather, mapping = aes(x = temp)) +
+  geom_histogram()
+```
+
+```{r}
+ggplot(data = weather, mapping = aes(x = temp)) +
+  geom_histogram(color = "white")
+```
+
+```{r}
+ggplot(data = weather, mapping = aes(x = temp)) +
+  geom_histogram(bins = 40, color = "white")
+```
+
+```{r}
+ggplot(data = weather, mapping = aes(x = temp)) +
+  geom_histogram(binwidth = 10, color = "white")
+```
+
+**Facets**
+
+```{r}
+ggplot(data = weather, mapping = aes(x = temp)) +
+  geom_histogram(binwidth = 5, color = "white") +
+  facet_wrap(~ month)
+```
+
+**Boxplots**
+
+```{r}
+ggplot(data = weather, mapping = aes(x = month, y = temp)) +
+  geom_boxplot()
+```
+
+```{r}
+ggplot(data = weather, mapping = aes(x = factor(month), y = temp)) +
+  geom_boxplot()
+```
+
+**Barplots**
+
+```{r}
+fruits <- tibble(
+  fruit = c("apple", "apple", "orange", "apple", "orange")
+)
+fruits_counted <- tibble(
+  fruit = c("apple", "orange"),
+  number = c(3, 2)
+)
+```
+
+```{r}
+ggplot(data = fruits, mapping = aes(x = fruit)) +
+  geom_bar()
+```
+
+```{r}
+ggplot(data = fruits_counted, mapping = aes(x = fruit, y = number)) +
+  geom_col()
+```
+
+```{r}
+ggplot(data = flights, mapping = aes(x = carrier)) +
+  geom_bar()
+```
+
+```{r}
+ggplot(data = flights, mapping = aes(x = carrier, fill = origin)) +
+  geom_bar()
+
+ggplot(data = flights, mapping = aes(x = carrier, fill = origin)) +
+  geom_bar(position = "dodge")
+
+ggplot(data = flights, mapping = aes(x = carrier, fill = origin)) +
+  geom_bar(position = position_dodge(preserve = "single"))
+```
+
+```{r}
+ggplot(data = flights, mapping = aes(x = carrier)) +
+  geom_bar() +
+  facet_wrap(~ origin, ncol = 1)
+```
+
+## Data Wrangling
+
+```{r}
+nycflights13::flights |> 
+  left_join(planes, join_by(tailnum)) |> 
+  mutate(flight_seat_miles = distance * seats) |> 
+  summarise(
+    .by = carrier, 
+    total_seat_miles = sum(flight_seat_miles, na.rm = TRUE)) |> 
+  arrange(desc(total_seat_miles))
+```
+
+## Data Importing and "Tidy" Data
+
+```{r}
+dem_score <- read_csv("https://moderndive.com/data/dem_score.csv")
+```
+
+```{r}
+drinks_smaller <- drinks %>% 
+  filter(country %in% c("USA", "China", "Italy", "Saudi Arabia")) %>% 
+  select(-total_litres_of_pure_alcohol) %>% 
+  rename(beer = beer_servings, spirit = spirit_servings, wine = wine_servings)
+drinks_smaller
+```
+
+```{r}
+drinks_smaller_tidy <- drinks_smaller %>% 
+  pivot_longer(names_to = "type", 
+               values_to = "servings", 
+               cols = -country)
+drinks_smaller_tidy
+```
+
+```{r}
+ggplot(drinks_smaller_tidy, aes(x = country, y = servings, fill = type)) +
+  geom_col(position = "dodge")
+```
+
